@@ -89,8 +89,9 @@ class Repo {
     return response;
   }
 
+
   Future<http.Response> updateContact({required Map<String, dynamic> contact, required String token}) async {
-    final url = Uri.parse('https://your-api-url.com/contacts/${contact['id']}');
+    final url = Uri.parse('https://crmcomponentapi.blueflower.in/api/contact/${contact['id']}');
     final headers = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
@@ -99,6 +100,10 @@ class Repo {
 
     final response = await http.put(url, headers: headers, body: body);
 
-    return response;
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      throw Exception('Failed to update contact');
+    }
   }
 }

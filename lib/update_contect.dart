@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:untitled1/bloc/contect_bloc/contact_bloc.dart';
 import 'package:untitled1/login_screen.dart';
-import 'package:untitled1/update_contect.dart';
+
 
 class UpdateContactScreen extends StatefulWidget {
   final String id;
@@ -37,24 +37,23 @@ class _UpdateContactScreenState extends State<UpdateContactScreen> {
       ),
       body: BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
-          if (state is  ContactUpdateErrorState) {
-            if (state.statusCode == 400) {
-              SnackBar(
-                content: Text(state.error),
+            if (state is ContactUpdateErrorState) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.error),
+                ),
               );
-              Navigator.push(context, MaterialPageRoute(builder: (context) =>  LoginScreen()));
-            } else {
-              SnackBar(
-                content: Text(state.error),
+              if (state.error.contains('TokenExpire')) {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+              }
+            }
+            if (state is ContactUpdateSuccessState) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Contact updated successfully'),
+                ),
               );
             }
-          }
-          if (state is ContactUpdateSuccessState) {
-            const SnackBar(
-              content: Text('Contact updated successfully'),
-            );
-          }
-
         },
         child: BlocBuilder<ContactBloc, ContactState>(
           builder: (context, state) {

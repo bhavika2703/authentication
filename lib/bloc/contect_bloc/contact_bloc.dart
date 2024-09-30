@@ -66,29 +66,18 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     }
   }
 
+
   void _updateContact(UpdateContact event, Emitter<ContactState> emit) async {
     emit(ContactUpdateLoading());
     try {
-      final response =
-          await _repo.updateContact(contact: event.contact, token: event.token);
+      final response = await _repo.updateContact(contact: event.contact, token: event.token);
+      final jsonData = jsonDecode(response.body);
       print('response:: ${response.statusCode}');
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        print('update contact :: $jsonData');
-        // emit(ContactUpdated(contact: jsonData));
-        emit(ContactUpdateSuccessState());
-      } else if (response.statusCode == 400) {
-        String decodedResponse = utf8.decode(response.bodyBytes);
-        print('decodedResponse $decodedResponse');
-        var map = jsonDecode(decodedResponse);
-        emit(ContactUpdateErrorState(
-            error: map['message'] ?? "TokenExpire.... Login again",
-            statusCode: response.statusCode));
-      } else {
-        emit(ContactUpdateErrorState(error: 'Failed to update contact'));
-      }
+      print('update contact :: $jsonData');
+      emit(ContactUpdateSuccessState());
     } catch (e) {
-      emit(ContactUpdateErrorState(error: 'Failed to update contact'));
+      emit(ContactUpdateErrorState(error: e.toString()));
     }
   }
+
 }
