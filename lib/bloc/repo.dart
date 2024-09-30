@@ -88,4 +88,17 @@ class Repo {
 
     return response;
   }
+
+  Future<http.Response> updateContact({required Map<String, dynamic> contact, required String token}) async {
+    final url = Uri.parse('https://your-api-url.com/contacts/${contact['id']}');
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+    final body = jsonEncode(contact);
+
+    final response = await http.put(url, headers: headers, body: body);
+
+    return response;
+  }
 }

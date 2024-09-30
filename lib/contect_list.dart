@@ -4,6 +4,8 @@ import 'package:untitled1/bloc/contect_bloc/contact_bloc.dart';
 import 'package:untitled1/bloc/repo.dart';
 import 'package:untitled1/contect_details.dart';
 
+import 'update_contect.dart';
+
 class ContactList extends StatefulWidget {
   final String token;
 
@@ -21,11 +23,12 @@ class _ContactListState extends State<ContactList> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    if (context.read<ContactBloc>().state is ContactInitial) {
-      context
-          .read<ContactBloc>()
-          .add(LoadContacts(pageNumber: 1, token: widget.token));
-    }
+    init();
+  }
+
+  init() {
+    BlocProvider.of<ContactBloc>(context)
+        .add(LoadContacts(pageNumber: 1, token: widget.token));
   }
 
   @override
@@ -36,10 +39,10 @@ class _ContactListState extends State<ContactList> {
 
   void _onScroll() {
     if (_scrollController.offset >=
-        _scrollController.position.maxScrollExtent &&
+            _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange) {
       final currentState = context.read<ContactBloc>().state;
-      if (currentState is ContactLoaded) {
+      if (currentState is ContactFetchEventLoadedState) {
         if (currentState.contacts.length >= 10) {
           context.read<ContactBloc>().add(LoadContacts(
               pageNumber: currentState.pageNumber + 1, token: widget.token));
@@ -57,17 +60,28 @@ class _ContactListState extends State<ContactList> {
       ),
       body: BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
-          if (state is ContactLoaded) {
+          if (state is ContactFetchEventLoadedState) {
             setState(() {});
+          }
+          if (state is ContactFetchEventLoadedState) {
+            if (context.read<ContactBloc>().state is ContactInitialState) {
+              context
+                  .read<ContactBloc>()
+                  .add(LoadContacts(pageNumber: 1, token: widget.token));
+            }
+          } else if (state is ContactInitialState) {
+            context
+                .read<ContactBloc>()
+                .add(LoadContacts(pageNumber: 1, token: widget.token));
           }
         },
         child: BlocBuilder<ContactBloc, ContactState>(
           builder: (context, state) {
-            if (state is ContactInitial) {
+            if (state is ContactInitialState) {
               return const Center(child: CircularProgressIndicator());
-            } else if (state is ContactLoading) {
+            } else if (state is ContactFetchEventLoading) {
               return const Center(child: CircularProgressIndicator());
-            } else if (state is ContactLoaded) {
+            } else if (state is ContactFetchEventLoadedState) {
               return Column(
                 children: [
                   Expanded(
@@ -75,25 +89,33 @@ class _ContactListState extends State<ContactList> {
                       itemCount: state.contacts.length,
                       itemBuilder: (context, index) {
                         final contact = state.contacts[index];
-                        return ListTile(
-                          title: Text(contact['first_name'] ??
-                              '' + ' ' + (contact['last_name'] ?? '')),
-                          subtitle: Text(contact['mobile'] ?? ''),
-                          onTap: () {
-                            context.read<ContactBloc>().add(LoadContactDetails(
-                                token: widget.token, id: contact['id']));
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ContactDetails(
-                                    id: contact['id'],
-                                    token: widget.token,
-                                  )),
-                            ).then((_) {
-                              context.read<ContactBloc>().add(LoadContacts(
-                                  pageNumber: 1, token: widget.token));
-                            });
-                          },
+                        return Column(
+                          children: [
+                            ListTile(
+                              title: Text(contact['first_name'] ??
+                                  '' + ' ' + (contact['last_name'] ?? '')),
+                              subtitle: Text(contact['mobile'] ?? ''),
+                              onTap: () {
+                                context.read<ContactBloc>().add(
+                                    LoadContactDetails(
+                                        token: widget.token,
+                                        id: contact['id']));
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ContactDetails(
+                                            id: contact['id'],
+                                            token: widget.token,
+                                          )),
+                                ).then((_) {
+                                  context.read<ContactBloc>().add(LoadContacts(
+                                        pageNumber: 1,
+                                        token: widget.token,
+                                      ));
+                                });
+                              },
+                            ),
+                          ],
                         );
                       },
                     ),
@@ -101,15 +123,16 @@ class _ContactListState extends State<ContactList> {
                   ElevatedButton(
                     onPressed: () {
                       context.read<ContactBloc>().add(LoadContacts(
-                          pageNumber: state.pageNumber + 1, token: widget.token));
+                          pageNumber: state.pageNumber + 1,
+                          token: widget.token));
                     },
                     child: const Text('Load More'),
                   ),
                 ],
               );
-            } else if (state is ContactLoadFailed) {
+            } else if (state is ContactFetchEventErrorState) {
               return Center(
-                child: Text(state.errorMsg),
+                child: Text(state.errorMsg ?? ''),
               );
             } else {
               return Container();

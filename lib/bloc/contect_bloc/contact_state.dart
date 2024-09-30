@@ -1,40 +1,41 @@
 part of 'contact_bloc.dart';
 
-
-
-
 abstract class ContactState {
   @override
   List<Object?> get props => [];
 }
 
-class ContactInitial extends ContactState {}
+//fetch
 
-class ContactLoading extends ContactState {}
+class ContactInitialState extends ContactState {}
 
-class ContactLoaded extends ContactState {
+class ContactFetchEventLoading extends ContactState {}
+
+class ContactFetchEventLoadedState extends ContactState {
   final List<dynamic> contacts;
   final int pageNumber;
 
-  ContactLoaded({required this.contacts, required this.pageNumber});
+  ContactFetchEventLoadedState(
+      {required this.contacts, required this.pageNumber});
 
   @override
   List<Object?> get props => [contacts, pageNumber];
 }
 
-class ContactLoadFailed extends ContactState {
-  final String errorMsg;
+class ContactFetchEventErrorState extends ContactState {
+  final String? errorMsg;
+  final int? statusCode;
 
-  ContactLoadFailed({required this.errorMsg});
+  ContactFetchEventErrorState(
+      { this.errorMsg,  this.statusCode});
 
-  @override
-  List<Object?> get props => [errorMsg];
+
 }
 
 class ContactDetailsLoaded extends ContactState {
   final Map<String, dynamic> contactDetails;
 
-   ContactDetailsLoaded({required this.contactDetails});
+  ContactDetailsLoaded({required this.contactDetails});
 
   @override
   List<Object> get props => [contactDetails];
@@ -45,8 +46,45 @@ class ContactDetailsLoading extends ContactState {}
 class ContactDetailsLoadFailed extends ContactState {
   final String errorMsg;
 
-   ContactDetailsLoadFailed({required this.errorMsg});
+  ContactDetailsLoadFailed({required this.errorMsg});
 
   @override
   List<Object> get props => [errorMsg];
+}
+
+/*class ContactUpdated extends ContactState {
+  final Map<String, dynamic> contact;
+
+   ContactUpdated({required this.contact});
+
+  @override
+  List<Object> get props => [contact];
+}
+
+class ContactUpdateLoading extends ContactState {}
+
+class ContactUpdateFailed extends ContactState {
+  final String errorMsg;
+
+   ContactUpdateFailed({required this.errorMsg});
+
+  @override
+  List<Object> get props => [errorMsg];
+}*/
+
+//update
+class ContactUpdateInitialState extends ContactState {}
+
+class ContactUpdateLoading extends ContactState {}
+
+class ContactUpdateSuccessState extends ContactState {}
+
+class ContactUpdateErrorState extends ContactState {
+  final String error;
+  final int? statusCode;
+
+  ContactUpdateErrorState({required this.error, this.statusCode});
+
+  @override
+  List<Object> get props => [error];
 }

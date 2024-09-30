@@ -26,3 +26,13 @@ class LoadContactDetails extends ContactEvent {
   @override
   List<Object> get props => [id];
 }
+
+class UpdateContact extends ContactEvent {
+  final Map<String, dynamic> contact;
+  final String token;
+
+   UpdateContact( {required this.contact,required this.token,});
+
+  @override
+  List<Object> get props => [contact,token];
+}

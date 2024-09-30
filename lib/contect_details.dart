@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:untitled1/bloc/contect_bloc/contact_bloc.dart';
+import 'package:untitled1/update_contect.dart';
 
 class ContactDetails extends StatefulWidget {
   final String id;
@@ -29,6 +30,7 @@ class _ContactDetailsState extends State<ContactDetails> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Contact Details'),
+        automaticallyImplyLeading: false,
       ),
       body: BlocBuilder<ContactBloc, ContactState>(
         builder: (context, state) {
@@ -40,67 +42,94 @@ class _ContactDetailsState extends State<ContactDetails> {
               child: Column(
                 children: [
                   ListTile(
-                    title: const Text('ID'),
+                    title: Text(
+                      'ID',
+                      style: buildTextStyle(),
+                    ),
                     subtitle: Text(contactDetails['id'] ?? ''),
                   ),
                   ListTile(
-                    title: const Text('First Name'),
+                    title:  Text('First Name',style: buildTextStyle(),),
                     subtitle: Text(contactDetails['first_name'] ?? ''),
                   ),
                   ListTile(
-                    title: const Text('Last Name'),
+                    title:  Text('Last Name',style: buildTextStyle(),),
                     subtitle: Text(contactDetails['last_name'] ?? ''),
                   ),
                   ListTile(
-                    title: const Text('Mobile'),
+                    title:  Text('Mobile',style: buildTextStyle(),),
                     subtitle: Text(contactDetails['mobile'] ?? ''),
                   ),
                   ListTile(
-                    title: const Text('Email'),
+                    title:  Text('Email',style: buildTextStyle(),),
                     subtitle: Text(contactDetails['email'] ?? ''),
                   ),
                   ListTile(
-                    title: const Text('Company Name'),
+                    title:  Text('Company Name',style: buildTextStyle(),),
                     subtitle: Text(contactDetails['company_name'] ?? ''),
                   ),
                   ListTile(
-                    title: const Text('Branch Name'),
+                    title:  Text('Branch Name',style: buildTextStyle(),),
                     subtitle: Text(contactDetails['branch_name'] ?? ''),
                   ),
                   ListTile(
-                    title: const Text('Department Name'),
+                    title:  Text('Department Name',style: buildTextStyle(),),
                     subtitle: Text(contactDetails['department_name'] ?? ''),
                   ),
                   ListTile(
-                    title: const Text('Created At'),
+                    title:  Text('Created At',style: buildTextStyle(),),
                     subtitle: Text(contactDetails['created_at'] ?? ''),
                   ),
                   ListTile(
-                    title: const Text('Updated At'),
+                    title:  Text('Updated At',style: buildTextStyle(),),
                     subtitle: Text(contactDetails['updated_at'] ?? ''),
                   ),
                   ListTile(
-                    title: const Text('Status'),
+                    title:  Text('Status',style: buildTextStyle(),),
                     subtitle: Text(contactDetails['status'].toString() ?? ''),
                   ),
                   ListTile(
-                    title: const Text('OTP'),
+                    title:  Text('OTP',style: buildTextStyle(),),
                     subtitle: Text(contactDetails['otp'] ?? ''),
                   ),
                   ListTile(
-                    title: const Text('OTP Expiry'),
+                    title:  Text('OTP Expiry',style: buildTextStyle(),),
                     subtitle: Text(contactDetails['otp_expiry'] ?? ''),
                   ),
                   ListTile(
-                    title: const Text('Is Change Password'),
+                    title:  Text('Is Change Password',style: buildTextStyle(),),
                     subtitle: Text(
                         contactDetails['is_change_password'].toString() ?? ''),
                   ),
-                  ListTile(
-                    title: const Text('Contact Type'),
-                    subtitle:
-                        Text(contactDetails['contact_types'][0]['name'] ?? ''),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: contactDetails['contact_types'].length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text('Contact Type ${index + 1}', style: buildTextStyle(),),
+                        subtitle: Text(contactDetails['contact_types'][index]['name'] ?? ''),
+                      );
+                    },
                   ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UpdateContactScreen(
+                                    id: widget.id,
+                                    token: widget.token,
+                                  )),
+                        ).then((_) {
+                          context.read<ContactBloc>().add(
+                              LoadContacts(pageNumber: 1, token: widget.token));
+                        });
+                      },
+                      child: const Text('Update Contact'),
+                    ),
+                  )
                 ],
               ),
             );
@@ -115,4 +144,6 @@ class _ContactDetailsState extends State<ContactDetails> {
       ),
     );
   }
+
+  TextStyle buildTextStyle() => TextStyle(fontWeight: FontWeight.bold);
 }
