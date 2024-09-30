@@ -18,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        backgroundColor: Colors.blue.shade50,
         title: const Text(
           'Login',
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -31,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
             return const Center(child: CircularProgressIndicator());
           } else if (state is LoginSuccess) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ContactList(token: state.token)),
               );

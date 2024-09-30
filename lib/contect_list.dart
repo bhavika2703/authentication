@@ -55,7 +55,9 @@ class _ContactListState extends State<ContactList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Contact List'),
+        centerTitle: true,
+        backgroundColor: Colors.blue.shade50,
+        title: const Text('Contact List',style: TextStyle(fontWeight: FontWeight.bold),),
         automaticallyImplyLeading: false,
       ),
       body: BlocListener<ContactBloc, ContactState>(
@@ -92,8 +94,15 @@ class _ContactListState extends State<ContactList> {
                         return Column(
                           children: [
                             ListTile(
-                              title: Text(contact['first_name'] ??
-                                  '' + ' ' + (contact['last_name'] ?? '')),
+                              title: Row(
+                                children: [
+                                  Text(contact['first_name'] ??
+                                      '',style: const TextStyle(color: Colors.blue,fontSize: 17,fontWeight: FontWeight.w500),),
+                                  const SizedBox(width: 8,),
+                                  Text(contact['last_name'] ??
+                                      '',style: const TextStyle(color: Colors.blue,fontSize: 17,fontWeight: FontWeight.w500),),
+                                ],
+                              ),
                               subtitle: Text(contact['mobile'] ?? ''),
                               onTap: () {
                                 context.read<ContactBloc>().add(

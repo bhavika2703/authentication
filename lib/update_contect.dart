@@ -32,6 +32,7 @@ class _UpdateContactScreenState extends State<UpdateContactScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue.shade50,
         title: const Text('Update Contact'),
         automaticallyImplyLeading: false,
       ),
@@ -53,6 +54,8 @@ class _UpdateContactScreenState extends State<UpdateContactScreen> {
                   content: Text('Contact updated successfully'),
                 ),
               );
+              Navigator.pop(context);
+              context.read<ContactBloc>().add(LoadContacts(pageNumber: 1, token: widget.token));
             }
         },
         child: BlocBuilder<ContactBloc, ContactState>(
@@ -131,7 +134,7 @@ class _UpdateContactScreenState extends State<UpdateContactScreen> {
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: () {
-                            if (_formKey.currentState!.validate()) {
+                            if (_formKey.currentState!.validate() && _mobileController.text.isNotEmpty) {
                               final contact = {
                                 'id': widget.id,
                                 'first_name': _firstNameController.text,
@@ -149,6 +152,8 @@ class _UpdateContactScreenState extends State<UpdateContactScreen> {
                                 contact: contact,
                                 token: widget.token,
                               ));
+                            }else{
+                              const SnackBar(content: Text('Please enter proper data'),);
                             }
                           },
                           child: const Text('Update Contact'),
